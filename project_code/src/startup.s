@@ -33,6 +33,15 @@
 // Cortex-M3 runs on thumb mode
 .thumb
 
+/* extern directives. All defined in the linker script except main */
+.extern _stack
+.extern _data
+.extern _edata
+.extern _data_loadaddr
+.extern _bss
+.extern _ebss
+.extern main
+
 /* Vector Table */
 // This is the first part of the .text section as specified
 // in the linker script.
@@ -58,15 +67,12 @@ vector_table:
     .rept 43
         .word loop_forever
     .endr
-// Nice trick
-.size vector_table, . - vector_table
-loop_forever:
-    b .
 
 .section .text
 /* Reset handler */
 .global reset_handler
 .type reset_handler, %function
+// This gets run after any and all resets
 reset_handler:
     /* Copy .data from flash (load) to RAM */
     ldr r0, =_data_loadaddr
@@ -80,8 +86,8 @@ copy_data:
     blt copy_data
 
     /* Zero .bss section */
-    ldr r0, =_bss_start
-    ldr r1, =_bss_end
+    ldr r0, =_bss
+    ldr r1, =_ebss
     mov r2, #0
 clear_bss:
     cmp r0, r1
@@ -92,14 +98,5 @@ clear_bss:
     /* Call main */
     bl main
     /* If main returns (it should not happen), loop */
-hang:
-    b hang
-
-/* Symbols from linker script */
-.extern _stack
-.extern _data
-.extern _edata
-.extern _data_loadaddr
-.extern _bss_start
-.extern _bss_end
-.extern main
+loop_forever:
+    b loop_forever
