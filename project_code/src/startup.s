@@ -24,78 +24,46 @@
  * decided to write an assembly file instead.
  */
 
+// Unified syntax between ARM and thumb modes
 .syntax unified
 .cpu cortex-m3
+// Apparently, Cortex-M3 does not have hardware built for floats
+// so it has to emulate it with software
 .fpu softvfp
+// Cortex-M3 runs on thumb mode
 .thumb
 
 /* Vector Table */
+// This is the first part of the .text section as specified
+// in the linker script.
 .section .vectors, "a"
-.type vector_table, %object
-.size vector_table, .-vector_table
-
 vector_table:
     .word _stack           /* Initial stack pointer */
     .word reset_handler    /* Reset handler */
-    .word nmi_handler
-    .word hard_fault_handler
-    .word mem_manage_handler
-    .word bus_fault_handler
-    .word usage_fault_handler
-    .word 0                /* Reserved */
-    .word 0                /* Reserved */
-    .word 0                /* Reserved */
-    .word 0                /* Reserved */
-    .word sv_call_handler
-    .word debug_monitor_handler
-    .word 0                /* Reserved */
-    .word pend_sv_handler
-    .word sys_tick_handler
-
-    /* External Interrupts (IRQ) - fill with 0 or handlers */
+    .word loop_forever
+    .word loop_forever
+    .word loop_forever
+    .word loop_forever
+    .word loop_forever
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word loop_forever
+    .word loop_forever
+    .word 0
+    .word loop_forever
+    .word loop_forever
+    /* External Interrupts (IRQ) */
     .rept 43
-        .word 0
+        .word loop_forever
     .endr
-
-/* Handlers - weak aliases */
-.weak nmi_handler
-.weak hard_fault_handler
-.weak mem_manage_handler
-.weak bus_fault_handler
-.weak usage_fault_handler
-.weak sv_call_handler
-.weak debug_monitor_handler
-.weak pend_sv_handler
-.weak sys_tick_handler
-
-.nmi_handler:
-    b .
-.hard_fault_handler:
-    b .
-.mem_manage_handler:
-    b .
-.bus_fault_handler:
-    b .
-.usage_fault_handler:
-    b .
-.sv_call_handler:
-    b .
-.debug_monitor_handler:
-    b .
-.pend_sv_handler:
-    b .
-.sys_tick_handler:
+// Nice trick
+.size vector_table, . - vector_table
+loop_forever:
     b .
 
-/* External IRQ handlers default */
-    .rept 43
-        .weak irq_handler
-        .set irq_handler, default_handler
-    .endr
-
-default_handler:
-    b .
-
+.section .text
 /* Reset handler */
 .global reset_handler
 .type reset_handler, %function
@@ -123,16 +91,15 @@ clear_bss:
 
     /* Call main */
     bl main
-
-    /* If main returns, loop */
+    /* If main returns (it should not happen), loop */
 hang:
     b hang
 
 /* Symbols from linker script */
 .extern _stack
-.extern _data_loadaddr
 .extern _data
 .extern _edata
+.extern _data_loadaddr
 .extern _bss_start
 .extern _bss_end
 .extern main
