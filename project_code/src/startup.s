@@ -74,7 +74,8 @@ vector_table:
 .type reset_handler, %function
 // This gets run after any and all resets
 reset_handler:
-    /* Copy .data from flash (load) to RAM */
+    nop
+    /* Copy .data FLASH to RAM */
     ldr r0, =_data_loadaddr
     ldr r1, =_data
     ldr r2, =_edata
@@ -91,7 +92,7 @@ copy_data:
     mov r2, #0
 clear_bss:
     cmp r0, r1
-    it lt
+    itt lt
     strlt r2, [r0], #4
     blt clear_bss
 
