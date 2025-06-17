@@ -6,7 +6,7 @@ AS = arm-none-eabi-as
 LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
-CFLAGS = -mcpu=cortex-m3 -mthumb -ffreestanding -nostartfiles -c -g
+CFLAGS = -mcpu=cortex-m3 -mthumb -ffreestanding -nostartfiles -g -c
 ASFLAGS = -mcpu=cortex-m3 -mthumb -g
 LDFLAGS = -T ../ld/linker_script.ld
 
@@ -18,8 +18,10 @@ firmware.bin: firmware.elf
 startup.o: $(SRC_DIR)/startup.s
 	$(AS) $(ASFLAGS) -o startup.o $(SRC_DIR)/startup.s
 
-main.o: $(SRC_DIR)/main.c
-	$(CC) $(CFLAGS) -o main.o $(SRC_DIR)/main.c
+#main.o: $(SRC_DIR)/main.c
+main.o: $(SRC_DIR)/addition.c
+	# $(CC) $(CFLAGS) -o main.o $(SRC_DIR)/main.c
+	$(CC) $(CFLAGS) -o main.o $(SRC_DIR)/addition.c
 
 firmware.elf: startup.o main.o
 	$(LD) $(LDFLAGS) -o firmware.elf startup.o main.o

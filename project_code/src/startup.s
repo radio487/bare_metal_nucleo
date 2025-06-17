@@ -35,11 +35,11 @@
 
 /* extern directives. All defined in the linker script except main */
 .extern _stack
-.extern _data
-.extern _edata
-.extern _data_loadaddr
-.extern _bss
-.extern _ebss
+.extern _beg_data_ram
+.extern _end_data_ram
+.extern _beg_data_flash
+.extern _beg_bss_ram
+.extern _end_bss_ram
 .extern main
 
 /* Vector Table */
@@ -76,28 +76,28 @@ vector_table:
 reset_handler:
     nop
     /* Copy .data FLASH to RAM */
-    ldr r0, =_data_loadaddr
-    ldr r1, =_data
-    ldr r2, =_edata
-copy_data:
+    ldr r0, =_beg_data_flash
+    ldr r1, =_beg_data_ram
+    ldr r2, =_end_data_ram
+data_flash_to_ram:
     cmp r1, r2
     ittt lt
     ldrlt r3, [r0], #4
     strlt r3, [r1], #4
-    blt copy_data
+    blt data_flash_to_ram
 
-    /* Zero .bss section */
-    ldr r0, =_bss
-    ldr r1, =_ebss
+    /* Zero out .bss section */
+    ldr r0, =_beg_bss_ram
+    ldr r1, =_end_bss_ram
     mov r2, #0
-clear_bss:
+zero_bss_loop:
     cmp r0, r1
     itt lt
     strlt r2, [r0], #4
-    blt clear_bss
+    blt zero_bss_loop
 
     /* Call main */
     bl main
-    /* If main returns (it should not happen), loop */
+    /* If main returns trap the cpu in a loop */
 loop_forever:
-    b loop_forever
+    b .

@@ -29,11 +29,11 @@ ENTRY(reset_handler)
 /* Define memory regions. */
 MEMORY {
   /* bluepill specific */
-	/*FLASH (rx) : ORIGIN = 0x08000000 , LENGTH = 64K */
-	/*RAM (rwx)  : ORIGIN = 0x20000000 , LENGTH = 20K*/
+	FLASH (rx) : ORIGIN = 0x08000000 , LENGTH = 64K 
+	RAM (rwx)  : ORIGIN = 0x20000000 , LENGTH = 20K
   /* mps2-an385 specific */
-  FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 16M
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 64K
+  /* FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 16M */
+  /* RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 64K */
 }
 
 /* Define sections. */
@@ -47,20 +47,20 @@ SECTIONS {
 	} >FLASH
 
 	.data : {
-		_data = .;
+		_beg_data_ram = .;
 		*(.data*)	/* Read-write initialized data */
 		*(.ramtext*)	/* "text" functions to run in ram */
 		. = ALIGN(4);
-		_edata = .;
+		_end_data_ram = .;
 	} > RAM AT > FLASH
-	_data_loadaddr = LOADADDR(.data);
+	_beg_data_flash = LOADADDR(.data);
 
 	.bss : {
-    _bss = .;
+    _beg_bss_ram = .;
 		*(.bss*)	/* Read-write zero initialized data */
 		*(COMMON)
 		. = ALIGN(4);
-		_ebss = .;
+		_end_bss_ram = .;
 	} > RAM
 }
 
