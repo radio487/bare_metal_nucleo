@@ -18,10 +18,10 @@ firmware.bin: firmware.elf
 startup.o: $(SRC_DIR)/startup.s
 	$(AS) $(ASFLAGS) -o startup.o $(SRC_DIR)/startup.s
 
-#main.o: $(SRC_DIR)/main.c
-main.o: $(SRC_DIR)/addition.c
-	# $(CC) $(CFLAGS) -o main.o $(SRC_DIR)/main.c
-	$(CC) $(CFLAGS) -o main.o $(SRC_DIR)/addition.c
+main.o: $(SRC_DIR)/main.c
+# main.o: $(SRC_DIR)/addition.c
+	$(CC) $(CFLAGS) -o main.o $(SRC_DIR)/main.c
+	# $(CC) $(CFLAGS) -o main.o $(SRC_DIR)/addition.c
 
 firmware.elf: startup.o main.o
 	$(LD) $(LDFLAGS) -o firmware.elf startup.o main.o
