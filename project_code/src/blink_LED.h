@@ -1,14 +1,14 @@
 // RCC registers for the APB2 bus where the green LED lives
-#define RCC_CR (*(volatile uint32_t*)0x40021000)
-#define RCC_APB2ENR (*(volatile uint32_t*)(0x40021000 + 0x18))
+#define RCC_CR_base 0x40021000
+#define RCC_APB2ENR (*(volatile uint32_t*)(RCC_CR_base + 0x18))
 
 // GPIOC registers
-#define GPIOC (*(volatile uint32_t*)(0x40011000))
+#define GPIOC_base 0x40011000
 // GPIOC from 0 to 7
-#define GPIOC_CRL (*(volatile uint32_t*)(0x40011000 + 0x00))
+#define GPIOC_CRL (*(volatile uint32_t*)(GPIO_base + 0x00))
 // GPIOC from 8 to 15. LED is 13.
-#define GPIOC_CRL2 (*(volatile uint32_t*)(0x40011000 + 0x04))
-#define GPIOC_ODR (*(volatile uint32_t*)(0x40011000 + 0x0C))
+#define GPIOC_CRL2 (*(volatile uint32_t*)(GPIO_base + 0x04))
+#define GPIOC_ODR (*(volatile uint32_t*)(GPIO_base + 0x0C))
 
 void idle_sec(void) {
   // gdb tells me this loop is 9 instructions per iteration
