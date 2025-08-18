@@ -33,7 +33,7 @@
 // Cortex-M3 runs on thumb mode
 .thumb
 
-/* extern directives. All defined in the linker script except main */
+/* extern directives for symbols defined in a separate file. All defined in the linker script except main */
 .extern _stack
 .extern _beg_data_ram
 .extern _end_data_ram
@@ -42,36 +42,40 @@
 .extern _end_bss_ram
 .extern main
 
+.global vector_table
+.global reset_handler
+.type reset_handler, %function
+.global systick_handler
+.type systick_handler, %function
+
 /* Vector Table */
 // This is the first part of the .text section as specified
 // in the linker script.
 .section .vectors, "a"
 vector_table:
-    .word _stack           /* Initial stack pointer */
+    .word _stack           /* Stack pointer */
     .word reset_handler    /* Reset handler */
-    .word loop_forever
-    .word loop_forever
-    .word loop_forever
-    .word loop_forever
-    .word loop_forever
-    .word 0
-    .word 0
-    .word 0
-    .word 0
-    .word loop_forever
-    .word loop_forever
-    .word 0
-    .word loop_forever
-    .word loop_forever
+    .word loop_forever     /* NMI */
+    .word loop_forever     /* HardFault */
+    .word loop_forever     /* MemMan */
+    .word loop_forever     /* BusFault */
+    .word loop_forever     /* UsageFault */
+    .word 0                /* Reserved */
+    .word 0                /* Reserved */
+    .word 0                /* Reserved */
+    .word 0                /* Reserved */
+    .word loop_forever     /* SuperVisor */
+    .word 0                /* Reserved */
+    .word 0                /* Reserved */
+    .word loop_forever     /* PendSV */
+    .word systick_handler  /* SysTick */
     /* External Interrupts (IRQ) */
     .rept 43
         .word loop_forever
     .endr
 
 .section .text
-/* Reset handler */
-.global reset_handler
-.type reset_handler, %function
+
 // This gets run after any and all resets
 reset_handler:
     nop
@@ -101,7 +105,13 @@ zero_bss_loop:
     /* If main returns trap the cpu in a loop */
 loop_forever:
     b .
-// SysTick handler
-
-
-
+systick_handler:
+    // We load the GPIOC_ODR register address to r0
+    ldr r0, =0x40011000
+    add r0, r0, #0x0C
+    // We load the contents pointed at by r0 in r1
+    ldr r1, [r0]
+    // This toggles the 13th bit 
+    eor r1, r1, #0x00002000
+    str r1, [r0]
+    bx lr

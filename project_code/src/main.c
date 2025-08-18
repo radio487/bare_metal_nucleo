@@ -4,8 +4,10 @@
 #include "blink_LED.h"
 
 int main() {
+  setup_LED();
+  enable_SysTick();
   while (1) {
-    toggle_LED_on_off();
+     ;
   }
   return 0;
 }
