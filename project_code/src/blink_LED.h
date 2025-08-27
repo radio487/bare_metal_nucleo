@@ -6,35 +6,34 @@ void idle_sec(int freq) {
     __asm__("nop");
   }
 }
-void enable_RCC_LED(void) {
-  // By default peripherals on the board are not powered which means we need to manually activate the clock. This is achieved with the RCC (Reset Clock Control) registers
-  // The onboard LED (the green one, not the automatic red one) is GPIO13 which is tied to the APB2 bus and according to the reference manual we need to tweak the RCC_APB2ENR register, in particular shifting bit 4 up which controls GPIOC
-  RCC_APB2ENR |= (1 << 4);
-}
-void disable_RCC_LED(void) {
-  // BUILD
-}
-void set_GPIOC_output_mode_2MHz(void) {
-  // 2MHz is a built in freq for the GPIO and it tells us the speed at which the GPIO can change from logic high to low.
-  // I change the CNF bits to general purpose output push-pull, that is we go from reset value 01 to 00 in bits 23 and 22
-  // Thus I need to only zero bit 22
-  GPIOC_CRH &= 0xFFBFFFFF;
-  // To light the LED we set MODE to output 2MHz. I choose 2MHz because the online pinouts
-  // of the bluepill say this pin has a max 2MHz.
-  // Thus, according to the reference manual the mode goes from reset 00 to 10 in bits 21 and 20
-  // This will turn the LED on, but we should not use it as a handler. There is another register for that.
-  GPIOC_CRH |= (1 << 21);
+void LED2_init(void) {
+  /* By default peripherals on the board are not powered which means we need to manually activate clock access to them. This is achieved with the RCC (Reset Clock Control) registers. LED2 is tied to GPIOA pin 5 (it is also tied to the Arduino header D13). This peripheral lives in the AHB2 bus
+   */
+  RCC_AHB2ENR |= (1 << 0);
+  // We now configure GPIOA pin 5 to general purpose output mode.
+  GPIOA_MODER &= ~(1 << 11);
+  GPIOA_MODER |= (1 << 10);
+  // Output push pull
+  GPIOA_OTYPER &= ~(1 << 15);
+  // Low speed
+  GPIOA_OSPEEDR &= ~(1 << 11);
+  GPIOA_OSPEEDR &= ~(1 << 10);
+  // no pull-up pull-down
+  GPIOA_PUPDR &= ~(1 << 11);
+  GPIOA_PUPDR &= ~(1 << 10);
+  // Atomic bit changes. This modifies the corresponding GPIOA_ODR bit as well
+  GPIOA_BSRR |= (1 << 5);
 }
 // We pack all the prep in one function
-void setup_LED(void) {
-  enable_RCC_LED();
-  set_GPIOC_output_mode_2MHz();
-}
+// void setup_LED2(void) {
+//   enable_RCC_LED();
+//   set_GPIOC_output_mode_2MHz();
+// }
 // If LED is on it switches it off and vice-versa
-void toggle_LED(void) {
-  // PC13 is active low, so to switch the LED off we need to set the Output Data Register's 13-th bit to 1. To switch it on again we would change the same bit. These two operations can be elegantly combined with XOR
-  GPIOC_ODR ^= (1 << 13);
-}
+// void toggle_LED(void) {
+//   // PC13 is active low, so to switch the LED off we need to set the Output Data Register's 13-th bit to 1. To switch it on again we would change the same bit. These two operations can be elegantly combined with XOR
+//   GPIOC_ODR ^= (1 << 13);
+// }
 // void manual_LED_on_off(void) {
 //   setup_LED();
 //   while (1) {

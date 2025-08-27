@@ -6,8 +6,9 @@ AS = arm-none-eabi-as
 LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
-CFLAGS = -mcpu=cortex-m3 -mthumb -ffreestanding -nostartfiles -g -c
-ASFLAGS = -mcpu=cortex-m3 -mthumb -g
+# CFLAGS = -mcpu=cortex-m3 -mthumb -ffreestanding -nostartfiles -g -c
+CFLAGS = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffreestanding -nostartfiles -g -c
+ASFLAGS = -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard -g
 LDFLAGS = -T ../ld/linker_script.ld
 
 all: firmware.bin

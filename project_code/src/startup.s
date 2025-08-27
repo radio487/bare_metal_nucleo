@@ -19,22 +19,21 @@
  */
 
 /*
- * Startup code for the bluepill which is meant to handle the vector table.
+ * Startup code for the STM32 NUCLEO board, which is meant to handle the vector table.
  * It is based on the vector.c file on the libopencm3 project but I have
  * decided to write an assembly file instead.
  */
 
 // Unified syntax between ARM and thumb modes
 .syntax unified
-.cpu cortex-m3
-// Apparently, Cortex-M3 does not have hardware built for floats
-// so it has to emulate it with software
-.fpu softvfp
-// Cortex-M3 runs on thumb mode
+.cpu cortex-m4
+// Directive for proper floating point handling with the NUCLEO board
+.fpu fpv4-sp-d16
+// Cortex-M4 runs on thumb2 
 .thumb
 
 /* extern directives for symbols defined in a separate file. All defined in the linker script except main */
-.extern _stack
+.extern _stack_pointer
 .extern _beg_data_ram
 .extern _end_data_ram
 .extern _beg_data_flash
@@ -53,7 +52,8 @@
 // in the linker script.
 .section .vectors, "a"
 vector_table:
-    .word _stack           /* Stack pointer */
+    /* Cortex M4 Interrupts */
+    .word _stack_pointer   /* Stack pointer */
     .word reset_handler    /* Reset handler */
     .word loop_forever     /* NMI */
     .word loop_forever     /* HardFault */
@@ -64,13 +64,13 @@ vector_table:
     .word 0                /* Reserved */
     .word 0                /* Reserved */
     .word 0                /* Reserved */
-    .word loop_forever     /* SuperVisor */
-    .word 0                /* Reserved */
+    .word loop_forever     /* SuperVisor Call */
+    .word loop_forever     /* Debug */
     .word 0                /* Reserved */
     .word loop_forever     /* PendSV */
     .word systick_handler  /* SysTick */
-    /* External Interrupts (IRQ) */
-    .rept 43
+    /* External Interrupts */
+    .rept 82
         .word loop_forever
     .endr
 
@@ -106,12 +106,13 @@ zero_bss_loop:
 loop_forever:
     b .
 systick_handler:
-    // We load the GPIOC_ODR register address to r0
-    ldr r0, =0x40011000
-    add r0, r0, #0x0C
+    // This is fine for now but make it atomic eventually
+    // We load the GPIOA_ODR register address to r0
+    ldr r0, =0x48000000
+    add r0, r0, #0x14
     // We load the contents pointed at by r0 in r1
     ldr r1, [r0]
-    // This toggles the 13th bit 
-    eor r1, r1, #0x00002000
+    // This toggles the 5th bit which controls LED2 
+    eor r1, r1, #0x00000020
     str r1, [r0]
     bx lr

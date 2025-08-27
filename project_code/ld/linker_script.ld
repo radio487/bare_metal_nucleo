@@ -18,7 +18,7 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Trimmed down linker script for the bluepill based on the libopencm3 version. */
+/* Trimmed down linker script based on the libopencm3 version. */
 
 /* Enforce emmition of the vector table. */
 EXTERN(vector_table)
@@ -28,9 +28,14 @@ ENTRY(reset_handler)
 
 /* Define memory regions. */
 MEMORY {
+  /* NUCLEO-L476RG specific */
+	FLASH (rx) : ORIGIN = 0x08000000 , LENGTH = 1M 
+	SRAM1 (rwx)  : ORIGIN = 0x20000000 , LENGTH = 96K
+  /* For now we will not do anything with SRAM2 */
+	SRAM2 (rwx)  : ORIGIN = 0x10000000 , LENGTH = 32K
   /* bluepill specific */
-	FLASH (rx) : ORIGIN = 0x08000000 , LENGTH = 64K 
-	RAM (rwx)  : ORIGIN = 0x20000000 , LENGTH = 20K
+	/* FLASH (rx) : ORIGIN = 0x08000000 , LENGTH = 64K  */
+	/* RAM (rwx)  : ORIGIN = 0x20000000 , LENGTH = 20K */
   /* mps2-an385 specific */
   /* FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 16M */
   /* RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 64K */
@@ -52,7 +57,7 @@ SECTIONS {
 		*(.ramtext*)	/* "text" functions to run in ram */
 		. = ALIGN(4);
 		_end_data_ram = .;
-	} > RAM AT > FLASH
+	} > SRAM1 AT > FLASH
 	_beg_data_flash = LOADADDR(.data);
 
 	.bss : {
@@ -61,7 +66,7 @@ SECTIONS {
 		*(COMMON)
 		. = ALIGN(4);
 		_end_bss_ram = .;
-	} > RAM
+	} > SRAM1
 }
 
-PROVIDE(_stack = ORIGIN(RAM) + LENGTH(RAM));
+PROVIDE(_stack_pointer = ORIGIN(SRAM1) + LENGTH(SRAM1));
