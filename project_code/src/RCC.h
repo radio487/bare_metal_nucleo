@@ -72,10 +72,10 @@ void set_PLLN(int f) {
   RCC_PLLCFGR |= (f << 8);
 }
 // The division factor
-// Notice we need to write f in binary starting at bit 4
+// Notice we need to write f-1 in binary starting at bit 4
 void set_PLLM(int f) {
   RCC_PLLCFGR &= ~(0x7 << 4);
-  RCC_PLLCFGR |= (f << 4);
+  RCC_PLLCFGR |= ((f-1) << 4);
 }
 void set_PLLR(int d) {
   // we edit bits 26 and 25
@@ -113,18 +113,30 @@ void switch_SYSCLK(int b) {
     case 0:
       RCC_CFGR &= ~(1 << 1);
       RCC_CFGR &= ~(1 << 0);
+      while ((RCC_CFGR & 0xc) != 0x0) {
+        ;
+      }
       break;
     case 1:
       RCC_CFGR &= ~(1 << 1);
       RCC_CFGR |= (1 << 0);
+      while ((RCC_CFGR & 0xc) != 0x4) {
+        ;
+      }
       break;
     case 2:
       RCC_CFGR |= (1 << 1);
       RCC_CFGR &= ~(1 << 0);
+      while ((RCC_CFGR & 0xc) != 0x8) {
+        ;
+      }
       break;
     case 3:
       RCC_CFGR |= (1 << 1);
       RCC_CFGR |= (1 << 0);
+      while ((RCC_CFGR & 0xc) != 0xc) {
+        ;
+      }
       break;
   }
 }

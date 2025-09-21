@@ -22,33 +22,36 @@
 // Transmit Data Register
 #define UART4_TDR (*(volatile uint32_t*)(UART4_base + 0x28))
 
-void setup_BRR(void) {
-  UART4_BRR = (39 << 4) | 1;
-}
-void UART_message_length(int l) {
-  if (l == 8) {
-    UART4_CR1 &= ~(1 << 8);
-  }
-  else if (l == 9) {
-    UART4_CR1 |= (1 << 12);
-  }
-}
-void UART_enable_parity(int b) {
-  if (b == 1) {
-    UART4_CR1 |= (1 << 10);
-  }
-  else if (b == 0) {
-    UART4_CR1 &= ~(1 << 10);
-  }
-}
-void UART_init(void) {
-
-  /* GPIO config */
-
+void UART4_enable_clock(void) {
   // The UART4 peripheral can be mapped to either GPIOA or GPIOC. For no particular reason I choose GPIOA
   // The actual pins are PA0 for Tx and PA1 for Rx 
   // First we activate the clock on GPIOA
   RCC_AHB2ENR |= (1 << 0);
+  // Then we activate the clock on the UART4 peripheral, which even if it goes through GPIOA, it needs to have its clock enabled as well
+  // It is amusing to note that GPIOA and UART4 do not live in the same bus
+  RCC_APB1ENR1 |= (1 << 19);
+}
+void setup_BRR(void) {
+  UART4_BRR = 0x2B6;
+}
+void UART_message_length(int l) {
+  // This is a bit weird in the sense that we need to edit two bits M1 and M0, but they are not contiguous
+  if (l == 8) {
+    UART4_CR1 &= ~(1 << 28);
+    UART4_CR1 &= ~(1 << 12);
+  }
+  else if (l == 9) {
+    UART4_CR1 &= ~(1 << 28);
+    UART4_CR1 |= (1 << 12);
+  }
+  else if (l == 7) {
+    UART4_CR1 |= (1 << 28);
+    UART4_CR1 &= ~(1 << 12);
+  }
+}
+void UART_init(void) {
+  /* GPIO config */
+
   // We now choose the appropriate Alternate Function for pin A0
   // We blank bits 0 to 3
   GPIOA_AFRL &= ~(0xF);
@@ -60,23 +63,24 @@ void UART_init(void) {
   // OTYPER to push-pull
   GPIOA_OTYPER &= ~(1);
   // OSPEED to medium speed
-  GPIOA_OSPEED &= ~(0x3);
-  GPIOA_OSPEED |= (0x1);
+  GPIOA_OSPEEDR &= ~(0x3);
+  GPIOA_OSPEEDR |= (0x1);
   // no pull
   GPIOA_PUPDR &= ~(0x3);
   GPIOA_PUPDR |= (0x0);
 
   /* UART peripheral registers config */
 
-  // Then we activate the clock on the UART4 peripheral, which even if it goes through GPIOA, it needs to have its clock enabled as well
-  RCC_APB1ENR1 |= (1 << 19);
-
-  // Now we actually enable the USART
+  // Now we enable the UART4 peripheral
   UART4_CR1 |= (1 << 0);
-  // This is the TE bit, it actually enables transmission
+  // This is the TE bit, it enables transmission
   UART4_CR1 |= (1 << 3);
 }
 void initiate_transmission(void) {
+  // Wait until TXE == 1 meaning we can write to TDR
+  while (!(UART4_ISR & (1 << 7))) {
+    ;
+  }
   // Never modify individual bits in this register
-  UART4_DR = 'a';
+  UART4_TDR = 'a';
 }

@@ -24,6 +24,7 @@ void LED2_init(void) {
   // Atomic bit changes. This modifies the corresponding GPIOA_ODR bit as well
   GPIOA_BSRR |= (1 << 5);
 }
+
 // We pack all the prep in one function
 // void setup_LED2(void) {
 //   enable_RCC_LED();
