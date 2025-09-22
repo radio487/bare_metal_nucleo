@@ -1,9 +1,11 @@
 # bare_metal_bluepill
 
-This repository is a self learning exercise on the stm32 bluepill. The goal is to gradually explore, include and modify the [libopencm3](https://github.com/libopencm3/libopencm3) codebase as needed. The project structure is as follows:
+This repository is a self learning exercise on the STM32L476RG microcontroller. The original idea was to use another microcontroller (STM32F103C8T6 bluepill) to gradually explore and modify the [libopencm3](https://github.com/libopencm3/libopencm3) codebase as an excuse to learn about the micro. Eventually, the decision to switch from the bluepill to a more feature rich one was taken. Moreover, most of the code ended up being written from scratch following the reference manual and the datasheet, although [libopencm3](https://github.com/libopencm3/libopencm3)-s influence can be clearly seen at places.
+
+The project structure is as follows:
 
 - `libopencm3/` - The full libopencm3 library clone.
-- `project_code/` - The project code, which will heavily use libopencm3 code, adding it piece by piece (and possibly modifying it here and there) as functionality is needed.
+- `project_code/` - The project code.
 
 ## License
 
@@ -12,4 +14,4 @@ Libopencm3 itself is also licensed under LGPLv3.
 
 ---
 
-Happy hacking!
+Happy coding!
