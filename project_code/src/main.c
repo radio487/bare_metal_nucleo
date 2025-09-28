@@ -40,13 +40,12 @@ int main() {
   setup_BRR();
   // We now bring up the peripheral
   UART_init();
+  
+  char s[] = "he";
+  send_string(s);
+  // for (volatile int i = 0; i < 10000; i++) {
+  //   ;
+  // }
 
-  while (1) {
-    // We send the character
-    initiate_transmission();
-    for (volatile int i = 0; i < 10000; i++) {
-      ;
-    }
-  }
   return 0;
 }

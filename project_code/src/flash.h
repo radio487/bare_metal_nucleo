@@ -1,4 +1,3 @@
-
 #define FLASH_registers_base 0x40022000
 #define FLASH_ACR (*(volatile uint32_t*)(FLASH_registers_base + 0x00))
 

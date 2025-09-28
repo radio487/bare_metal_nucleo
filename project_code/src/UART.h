@@ -76,11 +76,19 @@ void UART_init(void) {
   // This is the TE bit, it enables transmission
   UART4_CR1 |= (1 << 3);
 }
-void initiate_transmission(void) {
+void send_char(char c) {
   // Wait until TXE == 1 meaning we can write to TDR
   while (!(UART4_ISR & (1 << 7))) {
     ;
   }
   // Never modify individual bits in this register
-  UART4_TDR = 'a';
+  UART4_TDR = c;
 }
+void send_string(char *c) {
+  while (*c != '\0') {
+    send_char(*c);
+    c += 1;
+  }
+  send_char('\n');
+}
+
