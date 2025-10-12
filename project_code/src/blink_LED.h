@@ -9,7 +9,8 @@ void idle_sec(int freq) {
 void LED2_init(void) {
   /* By default peripherals on the board are not powered which means we need to manually activate clock access to them. This is achieved with the RCC (Reset Clock Control) registers. LED2 is tied to GPIOA pin 5 (it is also tied to the Arduino header D13). This peripheral lives in the AHB2 bus
    */
-  RCC_AHB2ENR |= (1 << 0);
+  init_GPIOA();
+
   // We now configure GPIOA pin 5 to general purpose output mode.
   GPIOA_MODER &= ~(1 << 11);
   GPIOA_MODER |= (1 << 10);

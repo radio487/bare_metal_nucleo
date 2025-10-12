@@ -1,11 +1,12 @@
 #include <stdint.h>
 // My header files
-#include "GPIO.h"
 #include "RCC.h"
+#include "GPIO.h"
 #include "flash.h"
 #include "SysTick.h"
 #include "blink_LED.h"
 #include "UART.h"
+#include "DHT22.h"
 
 int main() {
   
@@ -41,11 +42,12 @@ int main() {
   // We now bring up the peripheral
   UART_init();
   
-  char s[] = "he";
+  char s[] = "hello embedded world";
   send_string(s);
-  // for (volatile int i = 0; i < 10000; i++) {
-  //   ;
-  // }
+ 
+  /* DHT 22 temperature and humidity sensor */
+
+  setup_GPIOB_DHT22();
 
   return 0;
 }

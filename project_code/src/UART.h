@@ -26,7 +26,7 @@ void UART4_enable_clock(void) {
   // The UART4 peripheral can be mapped to either GPIOA or GPIOC. For no particular reason I choose GPIOA
   // The actual pins are PA0 for Tx and PA1 for Rx 
   // First we activate the clock on GPIOA
-  RCC_AHB2ENR |= (1 << 0);
+  init_GPIOA();
   // Then we activate the clock on the UART4 peripheral, which even if it goes through GPIOA, it needs to have its clock enabled as well
   // It is amusing to note that GPIOA and UART4 do not live in the same bus
   RCC_APB1ENR1 |= (1 << 19);
