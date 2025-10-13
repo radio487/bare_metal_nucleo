@@ -43,6 +43,10 @@ void init_GPIOA(void) {
   }
   else {
     RCC_AHB2ENR |= (1 << 0);
+    // Making sure we wait till the bit shifts
+    while (~(RCC_AHB2ENR & 0x1)) {
+      ;
+    }
   }
 }
 // Enables the clock to GPIOB. It does nothing if it is already set
@@ -53,6 +57,10 @@ void init_GPIOB(void) {
   }
   else {
     RCC_AHB2ENR |= (1 << 1);
+    // Making sure we wait till the bit shifts
+    while (~(RCC_AHB2ENR & 0x2)) {
+      ;
+    }
   }
 }
 
