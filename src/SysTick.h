@@ -19,3 +19,7 @@ void enable_SysTick(void) {
   // Manipulating bit 0 we trigger the clock
   STK_CTRL |= (1 << 0);
 }
+// d is the delay in seconds
+void SysTick_delay(int d) {
+  ;
+}

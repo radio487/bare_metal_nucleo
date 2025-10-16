@@ -50,7 +50,6 @@ int main() {
   // In the first stage of the protocol we ned to drive
   // the signal bus low for 1ms and then wait 20-40 us.
   setup_GPIOB_DHT22_output();
-  delay()  
 
 
   return 0;

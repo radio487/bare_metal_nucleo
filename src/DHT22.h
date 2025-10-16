@@ -13,24 +13,23 @@ void setup_GPIOB_DHT22_output(void) {
   // We switch it to very high speed because why not
   GPIOB_OSPEEDR &= ~(0x30);
   GPIOB_OSPEEDR |= (0x30);
-  // Pull-up
+  // No pull-up nor pull-down
   GPIOB_PUPDR &= ~(0x30);
+  // This step is not necessary strictly speaking as we blank the bits for this setting, but in general we would need it so I leave it for now
+  GPIOB_PUPDR |= (0x00);
+}
+// For when we need to let the sensor drive the Data bus low we need to configure an input mode
+void setup_GPIOB_DHT22_input(void) {
+  // First we need to activate the clock
+  init_GPIOB();
+  
+  // Input mode
+  GPIOA_MODER &= ~(0x30);
+  GPIOA_MODER |= (0x00);
+  // We switch it to very high speed because why not
+  GPIOB_OSPEEDR &= ~(0x30);
+  GPIOB_OSPEEDR |= (0x30);
+  // Pull up
+  GPIOA_PUPDR &= ~(0x30);
   GPIOB_PUPDR |= (0x10);
 }
-// void setup_GPIOB_DHT22_input(void) {
-//   // First we need to activate the clock
-//   init_GPIOB();
-//
-//   // WARNING This is copy pasted from elsewhere, I need to configure properly
-//   GPIOA_MODER &= ~(0x3);
-//   GPIOA_MODER |= (0x2);
-//   // OTYPER to push-pull
-//   GPIOA_OTYPER &= ~(1);
-//   // OSPEED to medium speed
-//   GPIOA_OSPEEDR &= ~(0x3);
-//   GPIOA_OSPEEDR |= (0x1);
-//   // no pull
-//   GPIOA_PUPDR &= ~(0x3);
-//   GPIOA_PUPDR |= (0x0);
-// }
-
