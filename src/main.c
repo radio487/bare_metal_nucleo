@@ -4,6 +4,7 @@
 #include "GPIO.h"
 #include "flash.h"
 #include "SysTick.h"
+#include "TIM2.h"
 #include "blink_LED.h"
 #include "UART.h"
 #include "DHT22.h"
@@ -47,9 +48,26 @@ int main() {
  
   /* DHT 22 temperature and humidity sensor */
   
+  // Let us first bring the clock on TIM2 up
+  init_clock_TIM2();
   // In the first stage of the protocol we ned to drive
   // the signal bus low for 1ms and then wait 20-40 us.
   setup_GPIOB_DHT22_output();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   return 0;
