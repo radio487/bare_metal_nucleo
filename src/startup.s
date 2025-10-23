@@ -40,6 +40,8 @@
 .extern _beg_bss_ram
 .extern _end_bss_ram
 .extern main
+// Interrupt symbols
+.extern TIM2_IRQHandler
 
 .global vector_table
 .global reset_handler
@@ -69,9 +71,24 @@ vector_table:
     .word 0                /* Reserved */
     .word loop_forever     /* PendSV */
     .word systick_handler  /* SysTick */
-    /* External Interrupts */
-    .rept 82
-        .word loop_forever
+    /* External Interrupts, Those of STM32 */
+    .rept 28
+      .word loop_forever
+    .endr
+    .word TIM2_IRQHandler /* TIM2 global interrupt */
+    .rept 23
+      .word loop_forever
+    .endr
+    .word loop_forever     /* UART4 global interrupt */
+    .rept 26
+      .word loop_forever
+    .endr
+    .word 0                /* Missing in my micro */
+    .word loop_forever     /* RNG interrupt */
+    .word loop_forever     /* Floating point interrupt */
+    .word loop_forever     /* CRS interrupt */
+    .rept 8
+      .word loop_forever
     .endr
 
 .section .text

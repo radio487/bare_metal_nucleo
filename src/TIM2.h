@@ -1,15 +1,21 @@
 #define TIM2_base 0x40000000
+// Basic Control registers
 #define TIM2_CR1 (*(volatile uint32_t*)(TIM2_base + 0x00))
 #define TIM2_CR2 (*(volatile uint32_t*)(TIM2_base + 0x04))
+// I can ignore this for now
 #define TIM2_SMCR (*(volatile uint32_t*)(TIM2_base + 0x08))
+// DMA and interrupt enable register
 #define TIM2_DIER (*(volatile uint32_t*)(TIM2_base + 0x0C))
 #define TIM2_SR (*(volatile uint32_t*)(TIM2_base + 0x10))
 #define TIM2_EGR (*(volatile uint32_t*)(TIM2_base + 0x14))
 #define TIM2_CCMR1 (*(volatile uint32_t*)(TIM2_base + 0x18))
 #define TIM2_CCMR2 (*(volatile uint32_t*)(TIM2_base + 0x1C))
 #define TIM2_CCER (*(volatile uint32_t*)(TIM2_base + 0x20))
+// Counter register
 #define TIM2_CNT (*(volatile uint32_t*)(TIM2_base + 0x24))
+// Prescaler register
 #define TIM2_PSC (*(volatile uint32_t*)(TIM2_base + 0x28))
+// Auto-Reload register
 #define TIM2_ARR (*(volatile uint32_t*)(TIM2_base + 0x2C))
 #define TIM2_CCR1 (*(volatile uint32_t*)(TIM2_base + 0x34))
 #define TIM2_CCR2 (*(volatile uint32_t*)(TIM2_base + 0x38))
@@ -35,3 +41,15 @@ void init_clock_TIM2(void) {
     return;
   }
 }
+// Of course, the clock frequency and prescalers will affect the delay
+void TIM2_set_counter_value(uint32_t cnt) {
+  TIM2_CNT = cnt;
+}
+// delay in seconds. This clogs the cpu execution
+void delay(int t, int *f) {
+  uint32_t ticks = (uint32_t)(t*(*f));
+
+  TIM2_set_counter_value(ticks);
+
+}
+

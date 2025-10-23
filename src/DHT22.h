@@ -23,7 +23,6 @@ void setup_GPIOB_DHT22_input(void) {
   // First we need to activate the clock
   init_GPIOB();
 
-
   // Input mode
   GPIOA_MODER &= ~(0x30);
   GPIOA_MODER |= (0x00);

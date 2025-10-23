@@ -140,4 +140,25 @@ void switch_SYSCLK(int b) {
       break;
   }
 }
+void set_max_freq(int *freq) {
+  int PLLN = 10, PLLM = 1, PLLR = 2, lat = 4;
 
+  // At starupt HSI16 should be enabled CHECK so this step is redundant at startup. Maybe take it off.
+  enable_HSI_clock();
+  // HSI16
+  PLL_source(2);
+  set_PLLN(PLLN);
+  set_PLLM(PLLM);
+  set_PLLR(PLLR);
+  enable_PLLR();
+  enable_PLL();
+
+  // Before switching the clock frequency we need to change the flash latency for the cpu to be able to fetch instructions at the new frequency
+  set_latency(lat);
+  
+  // PLL as source for SYSCLK at 80MHz
+  switch_SYSCLK(3);
+
+  // We need to update
+  *freq *= PLLN/PLLM/PLLR;
+}
