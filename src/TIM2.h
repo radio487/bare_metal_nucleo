@@ -27,7 +27,10 @@
 #define TIM2_OR2 (*(volatile uint32_t*)(TIM2_base + 0x60))
 
 // Enables the clock to TIM2. It does nothing if it is already set
-void init_clock_TIM2(void) {
+// IMPORTANT. TIM2 lives in APB1. For Timer clocks, there is a gotcha (specified on the RCC chapter Timer Clock section)
+// that the clock frequency fed to the Timer depends on the prescaler of the bus (in this case APB1). If the prescaler is 1
+// then the frequency fed to the clock is the same as that of the bus, otherwise thery are twice that of APB1.
+void init_clock_TIM2(int *f_TIM2) {
   // TIM2 lives in the APB1 bus
   if (RCC_APB1ENR1 & 0x1) {
     return;

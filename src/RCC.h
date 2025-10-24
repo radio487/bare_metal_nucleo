@@ -140,7 +140,7 @@ void switch_SYSCLK(int b) {
       break;
   }
 }
-void set_max_freq(int *freq) {
+void set_max_freq(struct clock_freq *f, struct prescalers *pre) {
   int PLLN = 10, PLLM = 1, PLLR = 2, lat = 4;
 
   // At starupt HSI16 should be enabled CHECK so this step is redundant at startup. Maybe take it off.
@@ -160,5 +160,8 @@ void set_max_freq(int *freq) {
   switch_SYSCLK(3);
 
   // We need to update
-  *freq *= PLLN/PLLM/PLLR;
+  f->SYSCLK *= PLLN/PLLM/PLLR;
+  f->HCLK = f->SYSCLK / pre->AHB;
+  f->PCLK1 = f->HCLK / pre->APB1;
+  f->PCLK2 = f->HCLK / pre->APB2;
 }

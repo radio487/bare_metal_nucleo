@@ -1,5 +1,6 @@
 #include <stdint.h>
 // My header files
+#include "structs.h"
 #include "flash.h"
 #include "RCC.h"
 #include "GPIO.h"
@@ -10,15 +11,25 @@
 #include "DHT22.h"
 #include "Interrupts.h"
 
+
 int main(int argc, char **argv) {
   
   /* Going to max frequency */
-  
-  // Startup frequency is that of the HSI16 oscilator: 16MHz
-  // We wanna keep a variable in the scope of main() that keeps track of the current frequency to be able to configure delays in timers
-  // In Hz
-  int freq = 16000000;
-  set_max_freq(&freq);
+
+  struct prescalers pre;
+  // Reset values
+  pre.AHB = 1;
+  pre.APB1 = 1; 
+  pre.APB2 = 1;
+
+  struct clock_freq f;
+  // Reset frequency is the HSI16 oscilator: 16MHz
+  f.SYSCLK = 16000000; 
+  f.HCLK = f.SYSCLK / pre.AHB;
+  f.PCLK1 = f.HCLK / pre.APB1;
+  f.PCLK2 = f.HCLK / pre.APB2;
+
+  set_max_freq(&f, &pre);
 
   /* LED and the SysTick interrupt */
 
@@ -41,7 +52,11 @@ int main(int argc, char **argv) {
   /* DHT 22 temperature and humidity sensor */
   
   // Let us first bring the clock on TIM2 up
-  init_clock_TIM2();
+  // The clock frequency of the Timer depends on the prescaler of the APB1 prescaler. If this prescaler is not 1, then it iw twice PCLK1.
+  // This means it will be handy to keep a separate variable
+  int f_TIM2;
+  // HERE DECIDE HOW TO DEFINE THE TIMER CLOCK FREQUENCIES. MAYBE pack them in a peripheral clock struct
+  init_clock_TIM2(&f_TIM2);
 
   // In the first stage of the protocol we ned to drive
   // the signal bus low for 1ms and then wait 20-40 us.
