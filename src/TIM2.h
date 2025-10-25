@@ -27,10 +27,7 @@
 #define TIM2_OR2 (*(volatile uint32_t*)(TIM2_base + 0x60))
 
 // Enables the clock to TIM2. It does nothing if it is already set
-// IMPORTANT. TIM2 lives in APB1. For Timer clocks, there is a gotcha (specified on the RCC chapter Timer Clock section)
-// that the clock frequency fed to the Timer depends on the prescaler of the bus (in this case APB1). If the prescaler is 1
-// then the frequency fed to the clock is the same as that of the bus, otherwise thery are twice that of APB1.
-void init_clock_TIM2(int *f_TIM2) {
+void init_clock_TIM2() {
   // TIM2 lives in the APB1 bus
   if (RCC_APB1ENR1 & 0x1) {
     return;
@@ -44,15 +41,54 @@ void init_clock_TIM2(int *f_TIM2) {
     return;
   }
 }
-// Of course, the clock frequency and prescalers will affect the delay
+/* IMPORTANT. TIM2 lives in APB1. For Timer clocks, there is a gotcha (specified on the RCC chapter Timer Clock section) that the clock frequency fed to the Timer depends on the prescaler of the bus (in this case APB1). If the prescaler is 1 then the frequency fed to the clock is the same as that of the bus, otherwise thery are twice that of APB1. Thus, I define a helper function that yields the TIM2 clock frequency */
+int TIM2_freq(struct prescalers *p, int PCLK1) {
+  if (p->AHB == 1) {
+    return PCLK1;
+  }
+  else {
+    return 2*PCLK1;
+  }
+}
+void TIM2_counter_enable(void) {
+  TIM2_CR1 |= (1 << 0);
+  while (!(TIM2_CR1 & 0x1)) {
+    ;
+  }
+}
+// count up or down, default is up
+void TIM2_direction(char c) {
+  if (c == 'u') {
+    TIM2_CR1 &= ~(1 << 4);
+    while (TIM2_CR1 & 0x10) {
+      ;
+    }
+  }
+  else if (c == 'd') {
+    TIM2_CR1 |= (1 << 4);
+    while (!(TIM2_CR1 & 0x10)) {
+      ;
+    }
+  }
+  else {
+    // Bad input, freeze execution
+    while(1) {
+      ;
+    }
+  }
+}
 void TIM2_set_counter_value(uint32_t cnt) {
   TIM2_CNT = cnt;
 }
-// delay in seconds. This clogs the cpu execution
-void delay(int t, int *f) {
-  uint32_t ticks = (uint32_t)(t*(*f));
+// delay in seconds
+void TIM2_delay(int t, int f_TIM2) {
+  uint32_t ticks = (uint32_t)(t*f_TIM2);
 
   TIM2_set_counter_value(ticks);
-
+  TIM2_direction('d');
+  TIM2_counter_enable();
+  while (!(TIM2_SR & 0x1)) {
+    ;
+  }
 }
 
