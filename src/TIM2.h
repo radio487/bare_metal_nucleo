@@ -78,7 +78,14 @@ void TIM2_direction(char c) {
   }
 }
 void TIM2_set_counter_value(uint32_t cnt) {
-  TIM2_CNT = cnt;
+  // We need to write to the ARR register NOT the CNT directly
+  TIM2_ARR = cnt;
+}
+void TIM2_set_one_pulse_mode() {
+  TIM2_CR1 |= (1 << 3);
+  while (!(TIM2_CR1 & 0x8)) {
+    ;
+  }
 }
 // delay in seconds
 void TIM2_delay(int t, int f_TIM2) {
@@ -86,9 +93,10 @@ void TIM2_delay(int t, int f_TIM2) {
 
   TIM2_set_counter_value(ticks);
   TIM2_direction('d');
+  // we want the timer to stop after a delay
+  // TIM2_set_one_pulse_mode();
   TIM2_counter_enable();
-  while (!(TIM2_SR & 0x1)) {
-    ;
-  }
+  // while (!(TIM2_SR & 0x1)) {
+  //   ;
+  // }
 }
-

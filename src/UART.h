@@ -91,4 +91,3 @@ void send_string(char *c) {
   }
   send_char('\n');
 }
-

@@ -49,7 +49,7 @@ SECTIONS {
 		. = ALIGN(4);
 		*(.rodata*)	/* Read-only data */
 		. = ALIGN(4);
-	} >FLASH
+	} > FLASH
 
 	.data : {
 		_beg_data_ram = .;

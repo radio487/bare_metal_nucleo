@@ -32,7 +32,7 @@
 // Cortex-M4 runs on thumb2 
 .thumb
 
-/* extern directives for symbols defined in a separate file. All defined in the linker script except main */
+/* extern directives for symbols defined in a separate file. All defined in the linker script except main and the Interrupt Request Handlers */
 .extern _stack_pointer
 .extern _beg_data_ram
 .extern _end_data_ram
@@ -45,9 +45,6 @@
 
 .global vector_table
 .global reset_handler
-.type reset_handler, %function
-.global systick_handler
-.type systick_handler, %function
 
 /* Vector Table */
 // This is the first part of the .text section as specified
@@ -70,8 +67,8 @@ vector_table:
     .word loop_forever     /* Debug */
     .word 0                /* Reserved */
     .word loop_forever     /* PendSV */
-    .word systick_handler  /* SysTick */
-    /* External Interrupts, Those of STM32 */
+    .word SysTick_handler  /* SysTick */
+    /* External Interrupts, Those of STM32. We got 83 total */
     .rept 28
       .word loop_forever
     .endr
@@ -87,9 +84,6 @@ vector_table:
     .word loop_forever     /* RNG interrupt */
     .word loop_forever     /* Floating point interrupt */
     .word loop_forever     /* CRS interrupt */
-    .rept 8
-      .word loop_forever
-    .endr
 
 .section .text
 
@@ -122,7 +116,7 @@ zero_bss_loop:
     /* If main returns trap the cpu in a loop */
 loop_forever:
     b .
-systick_handler:
+SysTick_handler:
     // This is fine for now but make it atomic eventually
     // We load the GPIOA_ODR register address to r0
     ldr r0, =0x48000000

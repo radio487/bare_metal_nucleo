@@ -1,6 +1,7 @@
 #include <stdint.h>
 // My header files
 #include "structs.h"
+#include "function_prototypes.h"
 #include "flash.h"
 #include "RCC.h"
 #include "GPIO.h"
@@ -10,7 +11,6 @@
 #include "UART.h"
 #include "DHT22.h"
 #include "Interrupts.h"
-
 
 int main(int argc, char **argv) {
   
@@ -39,7 +39,8 @@ int main(int argc, char **argv) {
   enable_SysTick();
 
   /* UART */
-
+  
+  // UART will be useful to "printf" debug with a Raspberry Pi
   UART4_enable_clock();
   // We configure the parameters of the communication protocol
   UART_message_length(8);
@@ -47,28 +48,24 @@ int main(int argc, char **argv) {
   // We now bring up the peripheral
   UART_init();
   
-  char s[] = "hello embedded world";
-  send_string(s);
- 
   /* DHT 22 Temperature and Humidity Sensor */
   
-  // Let us first bring the clock on TIM2 up
+  // We will use TIM2 to implement the communication protocol with the sensor
   init_clock_TIM2();
-
   // The clock frequency of the Timer depends on the prescaler of the APB1 prescaler. If this prescaler is not 1, then it is twice PCLK1.
   // Time is in seconds
   // Do NOT set t_delay > 50 seconds, as the tick number will overflow the uint32_t variable
-  int f_TIM2, t_delay = 10;
+  int f_TIM2, t_delay = 50;
   f_TIM2 = TIM2_freq(&pre, f.PCLK1);
   
   char s1[] = "Start";
   send_string(s1);
   TIM2_delay(t_delay, f_TIM2);
-  char s2[] = "End";
-  send_string(s2);
+  // char s2[] = "End";
+  // send_string(s2);
 
   // In the first stage of the protocol we ned to drive
-  // the signal bus low for 1ms and then wait 20-40 us.
+  // the Data bus low for 1ms and then wait 20-40 us.
   // setup_GPIOB_DHT22_output();
   
   while (1) {

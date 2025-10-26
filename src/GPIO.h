@@ -65,4 +65,3 @@ void init_GPIOB(void) {
   }
   return;
 }
-
