@@ -24,6 +24,9 @@ all: firmware.bin
 firmware.bin: firmware.elf
 	$(OBJCOPY) -O binary firmware.elf firmware.bin
 
+firmware.elf: startup.o main.o flash.o RCC.o GPIO.o LED.o SysTick.o UART.o TIM2.o
+	$(LD) $(LDFLAGS) -o firmware.elf startup.o main.o flash.o RCC.o GPIO.o LED.o SysTick.o UART.o TIM2.o
+
 startup.o: $(SRC_DIR)/startup.s
 	$(AS) $(ASFLAGS) -o startup.o $(SRC_DIR)/startup.s
 
@@ -32,8 +35,26 @@ main.o: $(SRC_DIR)/main.c
 	# trivial main function for debugging purposes
 	# $(CC) $(CFLAGS) -o main.o $(SRC_DIR)/main_test.c
 
-firmware.elf: startup.o main.o
-	$(LD) $(LDFLAGS) -o firmware.elf startup.o main.o
+flash.o: $(SRC_DIR)/flash.c
+	$(CC) $(CFLAGS) -o flash.o $(SRC_DIR)/flash.c
+
+RCC.o: $(SRC_DIR)/RCC.c
+	$(CC) $(CFLAGS) -o RCC.o $(SRC_DIR)/RCC.c
+
+GPIO.o: $(SRC_DIR)/GPIO.c
+	$(CC) $(CFLAGS) -o GPIO.o $(SRC_DIR)/GPIO.c
+
+LED.o: $(SRC_DIR)/LED.c
+	$(CC) $(CFLAGS) -o LED.o $(SRC_DIR)/LED.c
+
+SysTick.o: $(SRC_DIR)/SysTick.c
+	$(CC) $(CFLAGS) -o SysTick.o $(SRC_DIR)/SysTick.c
+
+UART.o: $(SRC_DIR)/UART.c
+	$(CC) $(CFLAGS) -o UART.o $(SRC_DIR)/UART.c
+
+TIM2.o: $(SRC_DIR)/TIM2.c
+	$(CC) $(CFLAGS) -o TIM2.o $(SRC_DIR)/TIM2.c
 
 clean:
 	rm -f ./*.o ./*.elf ./*.bin

@@ -1,5 +1,6 @@
-#define FLASH_registers_base 0x40022000
-#define FLASH_ACR (*(volatile uint32_t*)(FLASH_registers_base + 0x00))
+#include <stdint.h>
+#include "../include/flash.h"
+
 
 // bits 0, 1 and 2
 // we write lat in binary to these bits

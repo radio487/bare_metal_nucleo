@@ -2,6 +2,12 @@
 
 This repository is a self learning exercise on the STM32L476RG microcontroller. The original idea was to use another microcontroller (STM32F103C8T6 bluepill) to gradually explore and modify the [libopencm3](https://github.com/libopencm3/libopencm3) codebase as an excuse to learn about the micro. Eventually, the decision to switch from the bluepill to a more feature rich one was taken. Moreover, most of the code ended up being written from scratch following the reference manual and the datasheet, although [libopencm3](https://github.com/libopencm3/libopencm3)-s influence can be clearly seen at places.
 
+The repository contains a Makefile that handles the compilation process. In order to flash the binary, one can use the following openocd command:
+
+openocd -f board/st_nucleo_l4.cfg
+
+and then have arm-none-eabi-gdb connect to it.
+
 This work is ongoing.
 
 ## License

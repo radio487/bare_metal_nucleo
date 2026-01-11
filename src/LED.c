@@ -1,3 +1,8 @@
+#include <stdint.h>
+#include "../include/GPIO.h"
+#include "../include/LED.h"
+
+
 void idle_sec(int freq) {
   // freq is in MHz.
   // Using gdb we can verify this loop is 9 instructions per iteration.
@@ -25,25 +30,3 @@ void LED2_init(void) {
   // Atomic bit changes. This modifies the corresponding GPIOA_ODR bit as well
   GPIOA_BSRR |= (1 << 5);
 }
-
-// We pack all the prep in one function
-// void setup_LED2(void) {
-//   enable_RCC_LED();
-//   set_GPIOC_output_mode_2MHz();
-// }
-// If LED is on it switches it off and vice-versa
-// void toggle_LED(void) {
-//   // PC13 is active low, so to switch the LED off we need to set the Output Data Register's 13-th bit to 1. To switch it on again we would change the same bit. These two operations can be elegantly combined with XOR
-//   GPIOC_ODR ^= (1 << 13);
-// }
-// void manual_LED_on_off(void) {
-//   setup_LED();
-//   while (1) {
-//     idle_sec();
-//     // When configuring the GPIO the default is to have the LED on so we need to start offing
-//     toggle_LED();
-//     idle_sec();
-//     toggle_LED();
-//   }
-//   disable_RCC_LED();
-// }

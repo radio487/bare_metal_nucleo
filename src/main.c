@@ -1,20 +1,20 @@
 // Standard includes
 #include <stdint.h>
 // My header files
-#include "structs.h"
-#include "function_prototypes.h"
-#include "flash.h"
-#include "RCC.h"
-#include "GPIO.h"
-#include "SysTick.h"
-#include "TIM2.h"
-#include "blink_LED.h"
-#include "UART.h"
-#include "DHT22.h"
-#include "Interrupts.h"
+// #include "function_prototypes.h"
+#include "../include/flash.h"
+#include "../include/RCC.h"
+#include "../include/GPIO.h"
+#include "../include/LED.h"
+#include "../include/SysTick.h"
+#include "../include/UART.h"
+#include "../include/TIM2.h"
+// #include "DHT22.h"
+// #include "Interrupts.h"
 
+// No OS so no need for int argc, char **argv
 int main(void) {
-  
+
   // Testing the FPU
   volatile float tf0 = 1.3, tf1 = 2.4;
   volatile float tf2 = tf0 + tf1;
@@ -28,7 +28,7 @@ int main(void) {
   pre.APB2 = 1;
 
   struct clock_freq f;
-  // Reset frequency is the HSI16 oscilator: 16MHz
+  // Reset frequency comes from the HSI16 oscilator 16MHz
   f.SYSCLK = 16000000; 
   // MAKE THESE FLOATS?!?
   f.HCLK = f.SYSCLK / pre.AHB;
@@ -37,13 +37,21 @@ int main(void) {
 
   set_max_freq(&f, &pre);
 
-  /* LED and the SysTick Interrupt */
+  /*
+   * ==============================
+   * LED and the SysTick Interrupt
+   * ==============================
+   */
 
   LED2_init();
   // The interrupt of SysTick is toggling the LED
   enable_SysTick();
 
-  /* UART */
+  /*
+   * =====
+   * UART 
+   * =====
+   */
   
   // UART will be useful to "printf" debug with a Raspberry Pi
   UART4_enable_clock();
@@ -53,13 +61,21 @@ int main(void) {
   // We now bring up the peripheral
   UART_init();
   
-  /* DHT 22 Temperature and Humidity Sensor */
-  
+  /*
+   * =======================================
+   * DHT 22 Temperature and Humidity Sensor
+   * =======================================
+   */
+
+  /* In Construction */
+
   // We will use TIM2 to implement the communication protocol with the sensor
   init_clock_TIM2();
-  // The clock frequency of the Timer depends on the prescaler of the APB1 prescaler. If this prescaler is not 1, then it is twice PCLK1.
-  // Time is in seconds
-  // Do NOT set t_delay > 50 seconds, as the tick number will overflow the uint32_t variable
+  /*
+   * The clock frequency of the Timer depends on the prescaler of the APB1 prescaler. If this prescaler is not 1, then it is twice PCLK1.
+   * Time is in seconds.
+   * Do not set t_delay > 50 seconds, as the tick number will overflow the uint32_t variable.
+   */
   int f_TIM2, t_delay = 50;
   f_TIM2 = TIM2_freq(&pre, f.PCLK1);
   

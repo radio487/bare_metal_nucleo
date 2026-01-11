@@ -1,3 +1,13 @@
+#ifndef GPIO_HEADER
+#define GPIO_HEADER
+
+
+#include <stdint.h>
+
+/*
+ * Register defines
+ */
+
 #define GPIOA_base 0x48000000
 // GPIOA from 0 to 7
 #define GPIOA_MODER (*(volatile uint32_t*)(GPIOA_base + 0x00))
@@ -35,33 +45,13 @@
 #define GPIOG_base 0x48001800
 #define GPIOH_base 0x48001C00
 
-// Enables the clock to GPIOA. It does nothing if it is already set
-void init_GPIOA(void) {
-  // GPIOA lives in the AHB2 bus
-  if (RCC_AHB2ENR & 0x1) {
-    ;
-  }
-  else {
-    RCC_AHB2ENR |= (1 << 0);
-    // Making sure we wait till the bit shifts
-    while (!(RCC_AHB2ENR & 0x1)) {
-      ;
-    }
-  }
-  return;
-}
-// Enables the clock to GPIOB. It does nothing if it is already set
-void init_GPIOB(void) {
-  // GPIOA lives in the AHB2 bus
-  if (RCC_AHB2ENR & 0x2) {
-    ;
-  }
-  else {
-    RCC_AHB2ENR |= (1 << 1);
-    // Making sure we wait till the bit shifts
-    while (!(RCC_AHB2ENR & 0x2)) {
-      ;
-    }
-  }
-  return;
-}
+
+/*
+ * Function Prototypes
+ */
+
+void init_GPIOA(void);
+void init_GPIOB(void);
+
+
+#endif

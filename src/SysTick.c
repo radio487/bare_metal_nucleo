@@ -1,8 +1,5 @@
-#define SysTick_base 0xE000E010
-#define STK_CTRL (*(volatile uint32_t*)(SysTick_base + 0x00))
-#define STK_LOAD (*(volatile uint32_t*)(SysTick_base + 0x04))
-#define STK_VAL (*(volatile uint32_t*)(SysTick_base + 0x08))
-#define STK_CALIB (*(volatile uint32_t*)(SysTick_base + 0x0C))
+#include <stdint.h>
+#include "../include/SysTick.h"
 
 void enable_SysTick(void) {
   // The order of manipulation of these registers is important. If for instance we were to modify STK_CTRL first, the clock would go off with whatever garbage value was set in the other registers.
@@ -18,8 +15,4 @@ void enable_SysTick(void) {
   STK_CTRL |= (1 << 1);
   // Manipulating bit 0 we trigger the clock
   STK_CTRL |= (1 << 0);
-}
-// d is the delay in seconds
-void SysTick_delay(int d) {
-  ;
 }
