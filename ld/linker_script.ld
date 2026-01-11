@@ -18,17 +18,33 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 /* Trimmed down linker script based on the libopencm3 version. */
 
-/* Enforce emmition of the vector table. */
+
+/*
+ * This tells the linker that a global symbol vector_table exists.
+ * I make the symbol vector_table global in startup.s because
+ * I have forced the linker script to look for this symbol with
+ * this line EXTERN(vector_table). If I did not have this line
+ * in the linker script, I may get some weird bug where the
+ * linker omits the vector table. This is worthy of a test,
+ * so at some point comment out EXTERN(vector_table) in
+ * the linker script and see what happens. Also, as an added
+ * benefit, if I have this symbol I can see it from gdb.
+ */
 EXTERN(vector_table)
 
-/* Define the entry point of the output file. */
+/*
+ * Define the entry point of the output file. 
+ * This implicitly tells the linker reset_handler is
+ * a global symbol like EXTERN above.
+ */
 ENTRY(reset_handler)
 
 /* Define memory regions. */
 MEMORY {
-  /* NUCLEO-L476RG specific */
+  /* Nucleo-L476RG specific */
 	FLASH (rx) : ORIGIN = 0x08000000 , LENGTH = 1M 
 	SRAM1 (rwx)  : ORIGIN = 0x20000000 , LENGTH = 96K
   /* For now we will not do anything with SRAM2 */
@@ -43,11 +59,18 @@ MEMORY {
 
 /* Define sections. */
 SECTIONS {
+  /* The vector table, the executable code and constants
+   * go to FLASH to save RAM. */
 	.text : {
 		*(.vectors)	/* Vector table */
 		*(.text*)	/* Program code */
 		. = ALIGN(4);
-		*(.rodata*)	/* Read-only data */
+	  /*
+     * Read-only data. Any const global or static
+     * variable will go here. const variables inside
+     * functions (that are not static) will go to the stack though
+     */
+		*(.rodata*)
 		. = ALIGN(4);
 	} > FLASH
 

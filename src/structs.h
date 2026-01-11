@@ -1,4 +1,4 @@
-/* Global struct Definitions */
+/* Global struct definitions */
 
 // bus clock frequency prescalers
 struct prescalers {

@@ -1,3 +1,4 @@
+// Standard includes
 #include <stdint.h>
 // My header files
 #include "structs.h"
@@ -12,7 +13,11 @@
 #include "DHT22.h"
 #include "Interrupts.h"
 
-int main(int argc, char **argv) {
+int main(void) {
+  
+  // Testing the FPU
+  volatile float tf0 = 1.3, tf1 = 2.4;
+  volatile float tf2 = tf0 + tf1;
   
   /* Going to Max Frequency */
 
@@ -25,7 +30,7 @@ int main(int argc, char **argv) {
   struct clock_freq f;
   // Reset frequency is the HSI16 oscilator: 16MHz
   f.SYSCLK = 16000000; 
-  // MAKE THIS FLOATS?!?!!?!
+  // MAKE THESE FLOATS?!?
   f.HCLK = f.SYSCLK / pre.AHB;
   f.PCLK1 = f.HCLK / pre.APB1;
   f.PCLK2 = f.HCLK / pre.APB2;
