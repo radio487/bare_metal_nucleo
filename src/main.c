@@ -9,16 +9,13 @@
 #include "../include/SysTick.h"
 #include "../include/UART.h"
 #include "../include/TIM2.h"
+#include "../include/debug.h"
 // #include "DHT22.h"
 // #include "Interrupts.h"
 
 // No OS so no need for int argc, char **argv
 int main(void) {
 
-  // Testing the FPU
-  volatile float tf0 = 1.3, tf1 = 2.4;
-  volatile float tf2 = tf0 + tf1;
-  
   /*
    * ====================================
    * Bringing the board to Max Frequency
@@ -77,18 +74,21 @@ int main(void) {
 
   // We will use TIM2 to implement the communication protocol with the sensor
   init_clock_TIM2();
+  // TIM2 will freeze with the CPU while debugging
+  enable_TIM2_debug(); 
+
   /*
    * The clock frequency of the Timer depends on the prescaler of the APB1 prescaler. If this prescaler is not 1, then it is twice PCLK1.
-   * Time is in seconds.
+   * Time is in seconds and frequency in Hz.
    * Do not set t_delay > 50 seconds, as the tick number will overflow the uint32_t variable.
    */
-  int f_TIM2, t_delay = 20;
+  int f_TIM2, t_delay = 5;
   f_TIM2 = TIM2_freq(&pre, f.PCLK1);
   
   char s1[] = "\rTim2 delay start";
+  char s2[] = "\rTim2 delay end";
   send_string(s1);
   TIM2_delay(t_delay, f_TIM2);
-  char s2[] = "\rTim2 delay end";
   send_string(s2);
 
   // In the first stage of the protocol we need to drive

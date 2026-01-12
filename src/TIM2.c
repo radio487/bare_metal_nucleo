@@ -1,10 +1,12 @@
 #include <stdint.h>
 #include "../include/RCC.h"
 #include "../include/TIM2.h"
+#include "../include/UART.h"
+#include "../include/debug.h"
 
 
 // Enables the clock to TIM2. It does nothing if it is already set
-void init_clock_TIM2() {
+void init_clock_TIM2(void) {
   // TIM2 lives in the APB1 bus
   if (RCC_APB1ENR1 & 0x1) {
     return;
@@ -55,8 +57,16 @@ void TIM2_direction(char c) {
   }
 }
 void TIM2_set_counter_value(uint32_t cnt) {
-  // We need to write to the ARR register NOT the CNT directly
+  /* I had a fun bug here. So, the ARR register
+   * holds the value that is loaded to the CNT 
+   * register, which is the counter. Now, the CNT
+   * register starts at reset at 0, so I had configured
+   * TIM2 to downcounting and it immediately underflowed
+   * at the first cycle, triggering an update event. 
+   * This is why we write both the ARR and the CNT 
+   * registers. */
   TIM2_ARR = cnt;
+  TIM2_CNT = cnt;
 }
 void TIM2_set_one_pulse_mode() {
   TIM2_CR1 |= (1 << 3);
@@ -67,13 +77,15 @@ void TIM2_set_one_pulse_mode() {
 // delay in seconds
 void TIM2_delay(int t, int f_TIM2) {
   uint32_t ticks = (uint32_t)(t*f_TIM2);
+  char s[] = "\rin while loop";
 
   TIM2_set_counter_value(ticks);
   TIM2_direction('d');
+  TIM2_counter_enable();
+  // We wait until TIM2 counts down
+  while (!(TIM2_SR & 0x1)) {
+    ;
+  }
   // we want the timer to stop after a delay
   // TIM2_set_one_pulse_mode();
-  TIM2_counter_enable();
-  // while (!(TIM2_SR & 0x1)) {
-  //   ;
-  // }
 }
