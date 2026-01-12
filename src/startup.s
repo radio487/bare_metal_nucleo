@@ -137,6 +137,7 @@ vector_table:
 
 // Allocatable executable. These flags are implicit but I keep them
 .section .text, "ax"
+
 /* This symbol is the entry point. We have ENTRY(reset_handler)
  * in the linker script. The cpu always starts execution here after
  * a reset */
@@ -148,6 +149,7 @@ reset_handler:
  * have floats in my code so I enable it. This activation code
  * is actually extracted from ST's Cortex-M4 programmer's manual
  * section 4.6.6 which is about enabling the FPU. */
+
 activate_fpu:
   /* CPACR is located at address 0xE000ED88 */
   /* CPACR is the Coprocessor Access Control Register */
@@ -163,7 +165,8 @@ activate_fpu:
   /* reset pipeline now the FPU is enabled */
   isb
 
-  /* Copy .data from FLASH to RAM before calling main() */
+/* Copy .data from FLASH to RAM before calling main() */
+
   ldr r0, =_beg_data_flash
   ldr r1, =_beg_data_ram
   ldr r2, =_end_data_ram

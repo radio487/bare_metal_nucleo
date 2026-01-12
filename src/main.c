@@ -19,15 +19,18 @@ int main(void) {
   volatile float tf0 = 1.3, tf1 = 2.4;
   volatile float tf2 = tf0 + tf1;
   
-  /* Going to Max Frequency */
+  /*
+   * ====================================
+   * Bringing the board to Max Frequency
+   * ====================================
+   */
 
   struct prescalers pre;
-  // Reset values
+  struct clock_freq f;
+  // Initialize with reset values
   pre.AHB = 1;
   pre.APB1 = 1; 
   pre.APB2 = 1;
-
-  struct clock_freq f;
   // Reset frequency comes from the HSI16 oscilator 16MHz
   f.SYSCLK = 16000000; 
   // MAKE THESE FLOATS?!?
@@ -44,13 +47,13 @@ int main(void) {
    */
 
   LED2_init();
-  // The interrupt of SysTick is toggling the LED
+  // The SysTick interrupt is toggling the LED
   enable_SysTick();
 
   /*
-   * =====
-   * UART 
-   * =====
+   * =========================
+   * UART with a Raspberry Pi
+   * =========================
    */
   
   // UART will be useful to "printf" debug with a Raspberry Pi
@@ -60,6 +63,9 @@ int main(void) {
   setup_BRR();
   // We now bring up the peripheral
   UART_init();
+
+  char s0[] = "\rUART comms working between the Nucleo and the Pi";
+  send_string(s0);
   
   /*
    * =======================================
@@ -76,16 +82,16 @@ int main(void) {
    * Time is in seconds.
    * Do not set t_delay > 50 seconds, as the tick number will overflow the uint32_t variable.
    */
-  int f_TIM2, t_delay = 50;
+  int f_TIM2, t_delay = 20;
   f_TIM2 = TIM2_freq(&pre, f.PCLK1);
   
-  char s1[] = "Start";
+  char s1[] = "\rTim2 delay start";
   send_string(s1);
   TIM2_delay(t_delay, f_TIM2);
-  // char s2[] = "End";
-  // send_string(s2);
+  char s2[] = "\rTim2 delay end";
+  send_string(s2);
 
-  // In the first stage of the protocol we ned to drive
+  // In the first stage of the protocol we need to drive
   // the Data bus low for 1ms and then wait 20-40 us.
   // setup_GPIOB_DHT22_output();
   

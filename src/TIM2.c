@@ -18,7 +18,7 @@ void init_clock_TIM2() {
     return;
   }
 }
-/* IMPORTANT. TIM2 lives in APB1. For Timer clocks, there is a gotcha (specified on the RCC chapter Timer Clock section) that the clock frequency fed to the Timer depends on the prescaler of the bus (in this case APB1). If the prescaler is 1 then the frequency fed to the clock is the same as that of the bus, otherwise thery are twice that of APB1. Thus, I define a helper function that yields the TIM2 clock frequency */
+/* IMPORTANT. TIM2 lives in APB1. For Timer clocks, there is a gotcha (specified on the RCC chapter Timer Clock section) that the clock frequency fed to the Timer depends on the prescaler of the bus (in this case APB1). If the prescaler is 1 then the frequency fed to the clock is the same as that of the bus, otherwise they are twice that of APB1. Thus, I define a helper function that yields the TIM2 clock frequency */
 int TIM2_freq(struct prescalers *p, int PCLK1) {
   if (p->AHB == 1) {
     return PCLK1;
