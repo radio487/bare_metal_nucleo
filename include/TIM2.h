@@ -48,7 +48,7 @@ void TIM2_counter_enable(void);
 void TIM2_direction(char c);
 void TIM2_set_counter_value(uint32_t cnt);
 void TIM2_set_one_pulse_mode();
-void TIM2_delay(int t, int f_TIM2);
+void TIM2_delay(float t, int f_TIM2);
 
 
 #endif

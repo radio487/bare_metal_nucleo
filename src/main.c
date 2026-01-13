@@ -1,7 +1,6 @@
 // Standard includes
 #include <stdint.h>
 // My header files
-// #include "function_prototypes.h"
 #include "../include/flash.h"
 #include "../include/RCC.h"
 #include "../include/GPIO.h"
@@ -22,18 +21,17 @@ int main(void) {
    * ====================================
    */
 
-  struct prescalers pre;
-  struct clock_freq f;
+  // struct bus_prescalers pre;
+  // struct clock_freq_Hz f;
   // Initialize with reset values
-  pre.AHB = 1;
-  pre.APB1 = 1; 
-  pre.APB2 = 1;
-  // Reset frequency comes from the HSI16 oscilator 16MHz
-  f.SYSCLK = 16000000; 
-  // MAKE THESE FLOATS?!?
-  f.HCLK = f.SYSCLK / pre.AHB;
-  f.PCLK1 = f.HCLK / pre.APB1;
-  f.PCLK2 = f.HCLK / pre.APB2;
+  // pre.AHB = 1U;
+  // pre.APB1 = 1U; 
+  // pre.APB2 = 1U;
+  // f.SYSCLK = 16000000U; 
+  
+  // f.HCLK = f.SYSCLK / pre.AHB;
+  // f.PCLK1 = f.HCLK / pre.APB1;
+  // f.PCLK2 = f.HCLK / pre.APB2;
 
   set_max_freq(&f, &pre);
 
@@ -66,11 +64,9 @@ int main(void) {
   
   /*
    * =======================================
-   * DHT 22 Temperature and Humidity Sensor
+   * TIM2 timer
    * =======================================
    */
-
-  /* In Construction */
 
   // We will use TIM2 to implement the communication protocol with the sensor
   init_clock_TIM2();
@@ -82,11 +78,19 @@ int main(void) {
    * Time is in seconds and frequency in Hz.
    * Do not set t_delay > 50 seconds, as the tick number will overflow the uint32_t variable.
    */
-  int f_TIM2, t_delay = 5;
+  int f_TIM2;
+  // one milisecond
+  float t_delay = 0.001;
+
   f_TIM2 = TIM2_freq(&pre, f.PCLK1);
   
   char s1[] = "\rTim2 delay start";
   char s2[] = "\rTim2 delay end";
+
+  send_string(s1);
+  TIM2_delay(t_delay, f_TIM2);
+  send_string(s2);
+  t_delay = 10.0;
   send_string(s1);
   TIM2_delay(t_delay, f_TIM2);
   send_string(s2);

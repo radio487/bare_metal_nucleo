@@ -35,6 +35,19 @@ void TIM2_counter_enable(void) {
     ;
   }
 }
+void TIM2_counter_disable(void) {
+  TIM2_CR1 &= ~(1 << 0);
+  while (TIM2_CR1 & 0x1) {
+    ;
+  }
+}
+// Clear Update Event flag
+void TIM2_clear_UE_flag(void) {
+  TIM2_SR &= ~(1 << 0);
+  while (TIM2_SR & 0x1) {
+    ;
+  }
+}
 // count up or down, default is up
 void TIM2_direction(char c) {
   if (c == 'u') {
@@ -74,18 +87,24 @@ void TIM2_set_one_pulse_mode() {
     ;
   }
 }
-// delay in seconds
-void TIM2_delay(int t, int f_TIM2) {
+// delay in micro seconds
+void TIM2_delay_us(uint32_t t_delay, int f_TIM2) {
+
   uint32_t ticks = (uint32_t)(t*f_TIM2);
   char s[] = "\rin while loop";
 
+  // We need to clear the SR register bit
+  TIM2_clear_UE_flag();
   TIM2_set_counter_value(ticks);
   TIM2_direction('d');
+  // we want the timer to stop after a delay
+  TIM2_set_one_pulse_mode();
   TIM2_counter_enable();
   // We wait until TIM2 counts down
   while (!(TIM2_SR & 0x1)) {
     ;
+    // send_string("\rA milisecond is very short!");
   }
-  // we want the timer to stop after a delay
-  // TIM2_set_one_pulse_mode();
+  // We again cleanup the UE flag
+  TIM2_clear_UE_flag();
 }

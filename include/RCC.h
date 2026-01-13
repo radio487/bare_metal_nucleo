@@ -1,7 +1,6 @@
 #ifndef RCC_HEADER
 #define RCC_HEADER
 
-
 #include <stdint.h>
 
 /*
@@ -40,40 +39,51 @@
 #define RCC_BDCR (*(volatile uint32_t*)(RCC_base + 0x90))
 #define RCC_CSR (*(volatile uint32_t*)(RCC_base + 0x94))
 
-
 /*
  * Structs
  */
 
 // bus clock frequency prescalers
-struct prescalers {
-  int AHB;
-  int APB1;
-  int APB2;
+struct bus_prescalers {
+  uint32_t AHB;
+  uint32_t APB1;
+  uint32_t APB2;
 };
-// bus clock frequencies
-struct clock_freq {
-  int SYSCLK;
-  int HCLK;
-  int PCLK1;
-  int PCLK2;
+// System, bus clock and Timer frequencies in Hz
+struct clock_freq_Hz {
+  uint32_t MSICLK;
+  uint32_t HSI16CLK;
+  uint32_t HSECLK;
+  uint32_t PLLCLK;
+  uint32_t SYSCLK;
+  uint32_t HCLK;
+  uint32_t PCLK1;
+  uint32_t PCLK2;
+  uint32_t TIM2CLK;
 };
-
 
 /*
  * Function Prototypes
  */
 
-void enable_HSI_clock(void);
-void enable_HSE_clock(void);
+void enable_MSI(void);
+void disable_MSI(void);
+void enable_HSI16(void);
+void disable_HSI16(void);
+void enable_HSE(uint32_t f_HSE);
+void disable_HSE(void);
+void enable_PLL(void);
+void disable_PLL(void);
+void switch_SYSCLK(char c);
+
+void change_AHB_prescaler(uint32_t ahb);
+void change_APB1_prescaler(uint32_t apb1);
+void change_APB2_prescaler(uint32_t apb2);
 void PLL_source(int b);
 void set_PLLN(int f);
 void set_PLLM(int f);
 void set_PLLR(int d);
 void enable_PLLR(void);
-void enable_PLL(void);
-void switch_SYSCLK(int b);
-void set_max_freq(struct clock_freq *f, struct prescalers *pre);
-
+void set_max_freq(struct clock_freq_Hz *f, struct bus_prescalers *pre);
 
 #endif
